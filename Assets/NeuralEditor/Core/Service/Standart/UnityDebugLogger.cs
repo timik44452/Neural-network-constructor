@@ -2,18 +2,45 @@
 
 public class UnityDebugLogger : Core.Service.ILogger
 {
-    public void Error(object message)
+    public void Error(object message, object context)
     {
-        Debug.LogError(message);
+        Object unityContext = context as Object;
+
+        if (unityContext != null)
+        {
+            Debug.LogError(message, unityContext);
+        }
+        else
+        {
+            Debug.LogError(message);
+        }
     }
 
-    public void Log(object message)
+    public void Log(object message, object context)
     {
-        Debug.Log(message);
+        Object unityContext = context as Object;
+
+        if (unityContext != null)
+        {
+            Debug.Log(message, unityContext);
+        }
+        else
+        {
+            Debug.Log(message);
+        }
     }
 
-    public void Warning(object message)
+    public void Warning(object message, object context)
     {
-        Debug.LogWarning(message);
+        Object unityContext = context as Object;
+
+        if (unityContext != null)
+        {
+            Debug.LogWarning(message, unityContext);
+        }
+        else
+        {
+            Debug.LogWarning(message);
+        }
     }
 }

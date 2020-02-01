@@ -3,20 +3,15 @@ using UnityEngine;
 
 public class NeuralEditor : MonoBehaviour
 {
-    public static NeuralEditorWindow currentWindow { get; private set; }
+    public static NeuralEditorWindow currentWindow
+    {
+        get => EditorWindow.GetWindow<NeuralEditorWindow>(typeof(SceneView));
+    }
 
     [MenuItem("Window/Neural editor")]
     public static void ShowWindow()
     {
-        if(currentWindow == null)
-        {
-            currentWindow = EditorWindow.GetWindow<NeuralEditorWindow>();
-            currentWindow.ShowWindow();
-        }
-        else
-        {
-            currentWindow.Focus();
-        }
+        currentWindow.Show();
     }
 
     [MenuItem("Assets/Neural editor", true)]

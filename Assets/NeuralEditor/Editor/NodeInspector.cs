@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 
-[CustomEditor(typeof(NodeInspectorContainer))]
+[CustomEditor(typeof(NodeInspectorContainer)), CanEditMultipleObjects]
 public class NodeInspector : Editor
 {
     public override void OnInspectorGUI()

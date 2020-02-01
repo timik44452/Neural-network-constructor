@@ -1,8 +1,7 @@
-﻿using UnityEditor;
-using UnityEngine;
-
-using Core.Service;
+﻿using Core.Service;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 public class NeuralEditorWindow : EditorWindow
 {
@@ -15,15 +14,14 @@ public class NeuralEditorWindow : EditorWindow
     private GUISkin nodeSkin;
     private GUISkin nodeElipseSkin;
 
-    private bool isBuildMode = false;
-
     private List<Node> from_build_nodes;
     private List<Node> selected_nodes;
     private List<Link> selected_links;
-    
-    private const int grid_size = 17;
 
-    
+    private const float collision_radius = 0.65F;
+    private const float border_width = 12F;
+    private const float grid_size = 17;
+
     public void OnGUI()
     {
         if (Selection.activeObject is NetworkConfiguration)
@@ -33,7 +31,11 @@ public class NeuralEditorWindow : EditorWindow
             this.configuration = configuration;
         }
 
+        InitializeIfNull();
+        InitializeStyleIfNot();
+
         InputHandler();
+
         DrawBackground();
         DrawGrid(grid_size, 0.3F, new Color(0.15F, 0.15F, 0.15F));
         DrawGrid(grid_size * 10, 0.66F, new Color(0.15F, 0.15F, 0.15F));
@@ -41,46 +43,26 @@ public class NeuralEditorWindow : EditorWindow
         DrawNodes();
     }
 
-    public void ShowWindow()
-    {
-        if (nodeElipseSkin == null)
-        {
-            nodeElipseSkin = Resources.Load<GUISkin>("NodeEllipseSkin");
-        }
-
-        if (nodeSkin == null)
-        {
-            nodeSkin = Resources.Load<GUISkin>("NodeSkin");
-        }
-
-        Show();
-    }
-
     #region Input
+
     private void InputHandler()
     {
-        if (inputController == null)
-        {
-            inputController = new InputController();
-        }
-
         if (inputController.OnMouseDown == null)
         {
             inputController.OnMouseDown = MouseDown;
         }
 
-        if(inputController.OnMouseUp == null)
+        if (inputController.OnMouseUp == null)
         {
             inputController.OnMouseUp = MouseUp;
         }
 
-        if(inputController.OnKeyDown == null)
+        if (inputController.OnKeyDown == null)
         {
             inputController.OnKeyDown = OnKeyDown;
         }
 
         inputController.Update();
-
 
         if (inputController.isMiddleMouse)
         {
@@ -89,7 +71,7 @@ public class NeuralEditorWindow : EditorWindow
             Repaint();
         }
 
-        if(inputController.isScroll)
+        if (inputController.isScroll)
         {
             //Zoom normalno ne rabotaet
             //ViewportService.Zoom += inputController.delta.y * 0.01F;
@@ -100,7 +82,7 @@ public class NeuralEditorWindow : EditorWindow
 
     private void MouseDown()
     {
-        if(configuration == null)
+        if (configuration == null)
         {
             return;
         }
@@ -191,16 +173,23 @@ public class NeuralEditorWindow : EditorWindow
 
     private void OnKeyDown(KeyCode code)
     {
-        switch(code)
+        switch (code)
         {
-            case KeyCode.Delete:
+            case KeyCode.Escape:
                 {
-                    if (selected_nodes != null)
-                    {
-                        RemoveNodes(selected_nodes.ToArray());
-                    }
+                    EndBuild();
                 }
                 break;
+
+            case KeyCode.Delete:
+                {
+                    RemoveNodes(selected_nodes.ToArray());
+                    RemoveLinks(selected_links.ToArray());
+
+                    EndBuild();
+                }
+                break;
+
             case KeyCode.A:
                 {
                     if (inputController.isControl)
@@ -210,6 +199,14 @@ public class NeuralEditorWindow : EditorWindow
                 }
                 break;
 
+            case KeyCode.D:
+                {
+                    if (inputController.isControl)
+                    {
+                        Dublicate();
+                    }
+                }
+                break;
         }
 
         Repaint();
@@ -220,20 +217,10 @@ public class NeuralEditorWindow : EditorWindow
         DeselectAll();
         EndBuild();
     }
-    #endregion
 
-    private void RemoveNodes(params Node[] nodes)
-    {
-        foreach(Node node in nodes)
-        {
-            if(node == null)
-            {
-                continue;
-            }
+    #endregion Input
 
-            configuration?.RemoveNode(node.ID);
-        }
-    }
+    #region Node service
 
     private void CreateNode(int Type)
     {
@@ -244,9 +231,52 @@ public class NeuralEditorWindow : EditorWindow
         configuration?.AddNode(node);
     }
 
+    private void RemoveNodes(params Node[] nodes)
+    {
+        if (configuration == null)
+        {
+            return;
+        }
+
+        foreach (Node node in nodes)
+        {
+            configuration.RemoveNode(node);
+        }
+    }
+
     private void CreateLink(Link link)
     {
         configuration?.AddLink(link);
+    }
+
+    private void RemoveLinks(params Link[] links)
+    {
+        if (configuration == null)
+        {
+            return;
+        }
+
+        foreach (Link link in links)
+        {
+            configuration.RemoveLink(link);
+        }
+    }
+
+    private void Dublicate()
+    {
+        if (configuration == null)
+        {
+            return;
+        }
+
+        configuration.Dublicate(selected_nodes.ToArray());
+
+        selected_nodes.ForEach(node =>
+        {
+            CalculateCollision(Vector2.one * node.position.size.magnitude * 0.5F, node);
+        });
+
+        Repaint();
     }
 
     private void SelectAll()
@@ -256,11 +286,6 @@ public class NeuralEditorWindow : EditorWindow
             return;
         }
 
-        if(selected_nodes == null)
-        {
-            selected_nodes = new List<Node>();
-        }
-
         selected_nodes.Clear();
 
         selected_nodes.AddRange(configuration.nodes);
@@ -268,17 +293,20 @@ public class NeuralEditorWindow : EditorWindow
 
     private void DeselectAll()
     {
-        selected_nodes?.Clear();
-        selected_links?.Clear();
+        selected_nodes.Clear();
+        selected_links.Clear();
+    }
+
+    private void BeginMultiselect()
+    {
+    }
+
+    private void EndMultiselect()
+    {
     }
 
     private void SelectOrDeselectNode(Node node)
     {
-        if (selected_nodes == null)
-        {
-            selected_nodes = new List<Node>();
-        }
-
         if (!inputController.isShift)
         {
             selected_nodes.Clear();
@@ -295,7 +323,7 @@ public class NeuralEditorWindow : EditorWindow
 
         if (selected_nodes.Count > 0)
         {
-            Selection.activeObject = NodeInspectorContainerFactory.CreateContainer(selected_nodes[selected_nodes.Count - 1], configuration, this);
+            Selection.objects = NodeInspectorContainerFactory.CreateContainer(selected_nodes, configuration, this);
         }
         else
         {
@@ -308,27 +336,18 @@ public class NeuralEditorWindow : EditorWindow
 
     private bool IsSelectedNode(Node node)
     {
-        if(selected_nodes == null)
-        {
-            return false;
-        }
-
         return selected_nodes.Contains(node);
     }
 
+    #endregion Node service
+
     #region Build handler
+
     private void BeginBuild(Node node)
     {
-        if(from_build_nodes == null)
-        {
-            from_build_nodes = new List<Node>();
-        }
-
         from_build_nodes.Clear();
 
         from_build_nodes.Add(node);
-
-        isBuildMode = true;
 
         DeselectAll();
 
@@ -350,19 +369,22 @@ public class NeuralEditorWindow : EditorWindow
             });
         }
 
-        isBuildMode = false;
-
-        from_build_nodes?.Clear();
+        from_build_nodes.Clear();
 
         Repaint();
     }
-    #endregion
+
+    private bool IsBuildMode()
+    {
+        return from_build_nodes.Count > 0;
+    }
+
+    #endregion Build handler
 
     #region Drawing service
+
     private void DrawNodes()
     {
-        float border = 4F;
-
         if (configuration == null)
         {
             return;
@@ -372,7 +394,6 @@ public class NeuralEditorWindow : EditorWindow
 
         foreach (Node node in configuration.nodes)
         {
-
             GUI.skin = nodeSkin;
 
             if (IsSelectedNode(node))
@@ -385,20 +406,42 @@ public class NeuralEditorWindow : EditorWindow
 
                 Rect selection_rect = ViewportService.ToSceneRect(node.position);
 
-                selection_rect.x -= border;
-                selection_rect.y -= border;
-                selection_rect.width += border * 2;
-                selection_rect.height += border * 2;
+                selection_rect.x -= border_width * 0.5F;
+                selection_rect.y -= border_width * 0.5F;
+                selection_rect.width += border_width;
+                selection_rect.height += border_width;
 
                 GUI.Box(selection_rect, "");
             }
 
+            var right_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, node.position, false));
+            var left_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, node.position, false));
+
             GUI.color = node.color;
 
-            //node.position = ViewportService.FromSceneRect(GUI.Window(node.ID, ViewportService.ToSceneRect(node.position), (int id) => OnWindow(id, node), node.ID.ToString()));
-
             GUI.Box(ViewportService.ToSceneRect(node.position), "");
-            OnWindow(node.ID, node);
+
+            GUI.color = new Color(0, 1F, 1F, 0.3F);
+            GUI.skin = nodeElipseSkin;
+
+            if (NodeRules.ContainsRightConnection(node))
+            {
+                GUI.Box(right_rect, "");
+            }
+
+            if (NodeRules.ContainsLeftConnection(node))
+            {
+                GUI.Box(left_rect, "");
+            }
+
+            if (IsSelectedNode(node) && inputController.isLeftMouse)
+            {
+                node.position.position += inputController.delta * 0.5F;
+
+                CalculateCollision(inputController.delta, node);
+
+                Repaint();
+            }
         }
 
         EndWindows();
@@ -421,14 +464,14 @@ public class NeuralEditorWindow : EditorWindow
                 Rect from_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, from.position, false));
                 Rect to_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, to.position, false));
 
-                Vector2 vector_from = from_rect.position + from_rect.size * 0.5F;
-                Vector2 vector_to = to_rect.position + to_rect.size * 0.5F;
+                Vector2 from_point = from_rect.position + new Vector2(to_rect.size.x, to_rect.size.y * 0.5F);
+                Vector2 to_point = to_rect.position + new Vector2(0, to_rect.size.y * 0.5F);
 
-                DrawCurve(2, vector_from, vector_to, new Color(0.55F, 0.55F, 0.55F, 0.6F), new Color(0.55F, 0.55F, 0.55F, 0.6F));
+                DrawCurve(2, from_point, to_point, new Color(0.55F, 0.55F, 0.55F, 0.6F), new Color(0.55F, 0.55F, 0.55F, 0.6F));
             }
         }
 
-        if (isBuildMode && from_build_nodes != null)
+        if (IsBuildMode())
         {
             from_build_nodes.ForEach(x =>
             {
@@ -501,36 +544,10 @@ public class NeuralEditorWindow : EditorWindow
 
             Handles.color = Mathf.Round(t / steep) % 2 == 0 ? first_color : second_color;
 
-            for (float i = -width / 2F; i < width / 2F; i+=0.5F)
+            for (float i = -width / 2F; i < width / 2F; i += 0.5F)
             {
                 Handles.DrawLine(new Vector3(x + cross_x * i, y + cross_y * i), new Vector3(x1 + cross_x * i, y1 + cross_y * i));
             }
-        }
-    }
-
-    private void OnWindow(int id, Node node)
-    {
-        GUI.color = new Color(0, 1F, 1F, 0.3F);
-        GUI.skin = nodeElipseSkin;
-
-        var right_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, node.position, false));
-        var left_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, node.position, false));
-
-        if (NodeRules.ContainsRightConnection(node))
-        {
-            GUI.Box(right_rect, "");
-        }
-
-        if (NodeRules.ContainsLeftConnection(node))
-        {
-            GUI.Box(left_rect, "");
-        }
-
-        if (IsSelectedNode(node) && inputController != null && inputController.isLeftMouse)
-        {
-            node.position.position += inputController.delta * 0.5F;
-
-            Repaint();
         }
     }
 
@@ -538,5 +555,68 @@ public class NeuralEditorWindow : EditorWindow
     {
         return Mathf.Sin(value * Mathf.PI + 1.5F * Mathf.PI) / 2F + 0.5F;
     }
-    #endregion
+
+    #endregion Drawing service
+
+    #region Collision
+
+    private void CalculateCollision(Vector2 velocity, Node body)
+    {
+        if (configuration == null)
+        {
+            return;
+        }
+
+        var collidedNodes = configuration.nodes.FindAll(x => x != body && Extensions.IsCollidedCircle(body.position, x.position, collision_radius));
+
+        if (collidedNodes.Count > 0)
+        {
+            collidedNodes.ForEach(node =>
+            {
+                Vector2 crossVelocity = (node.position.center - body.position.center).normalized;
+
+                node.position.position += velocity + crossVelocity;
+
+                CalculateCollision(velocity, node);
+            });
+        }
+    }
+
+    #endregion Collision
+
+    private void InitializeIfNull()
+    {
+        if (selected_links == null)
+        {
+            selected_links = new List<Link>();
+        }
+
+        if (selected_nodes == null)
+        {
+            selected_nodes = new List<Node>();
+        }
+
+        if (inputController == null)
+        {
+            inputController = new InputController();
+        }
+
+        if (from_build_nodes == null)
+        {
+            from_build_nodes = new List<Node>();
+        }
+    }
+
+    private void InitializeStyleIfNot()
+    {
+        if (nodeElipseSkin == null)
+        {
+            nodeElipseSkin = Resources.Load<GUISkin>("Skins/NodeEllipseSkin");
+        }
+
+        if (nodeSkin == null)
+        {
+            nodeSkin = Resources.Load<GUISkin>("Skins/NodeSkin");
+        }
+    }
 }

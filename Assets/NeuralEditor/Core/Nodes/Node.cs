@@ -9,6 +9,11 @@ public class Node
 
     public Color color;
 
+    public Node Clone()
+    {
+        return (Node)MemberwiseClone();
+    }
+
     public override bool Equals(object obj)
     {
         return obj is Node node &&

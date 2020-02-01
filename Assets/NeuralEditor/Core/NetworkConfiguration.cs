@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
+
+using System;
 using System.Linq;
 using System.Collections.Generic;
+
 
 [CreateAssetMenu]
 public class NetworkConfiguration : ScriptableObject
@@ -10,12 +13,7 @@ public class NetworkConfiguration : ScriptableObject
 
     public void AddLink(Link link)
     {
-        if (link == null)
-        {
-            return;
-        }
-
-        if (links.Find(x => x.from == link.from && x.to == link.to) != null)
+        if (link == null || links.Contains(link))
         {
             return;
         }
@@ -23,32 +21,36 @@ public class NetworkConfiguration : ScriptableObject
         links.Add(link);
     }
 
-    public void RemoveLink(int from, int to)
+    public void RemoveLink(Link link)
     {
-        if (links.Find(x => x.from == from && x.to == to) != null)
-        {
-            links.RemoveAll(x => x.from == from && x.to == to);
-        }
-    }
-
-    public void AddNode(Node neuron)
-    {
-        neuron.ID = GetId();
-
-        nodes.Add(neuron);
+        links.Remove(link);
 
         Save();
     }
 
-    public void RemoveNode(int Id)
+    public void AddNode(Node node)
     {
-        links.RemoveAll(x => x.from == Id || x.to == Id);
-        nodes.RemoveAll(x => x.ID == Id);
+        node.ID = GetID();
+
+        nodes.Add(node);
+
+        Save();
     }
 
-    private int GetId()
+    public void RemoveNode(Node node)
     {
-        if (nodes.Count == 0)
+        if(node == null)
+        {
+            return;
+        }
+        
+        links.RemoveAll(x => x.from == node.ID || x.to == node.ID);
+        nodes.Remove(node);
+    }
+
+    private int GetID()
+    {
+        if(nodes.Count() == 0)
         {
             return 0;
         }
@@ -60,5 +62,43 @@ public class NetworkConfiguration : ScriptableObject
     {
         UnityEditor.EditorUtility.SetDirty(this);
         UnityEditor.AssetDatabase.SaveAssets();
+    }
+
+    public void Dublicate(params Node[] nodes)
+    {
+        if (this.nodes.Count == 0 || nodes.Length == 0)
+        {
+            return;
+        }
+
+        int stride = GetID() - nodes.Max(x => x.ID);
+
+        foreach(Node node in nodes)
+        {
+            Node cloneNode = node.Clone();
+
+            cloneNode.ID = GetID();
+
+            links.FindAll(x => x.to == node.ID).ForEach(x =>
+            {
+                Link cloneLink = x.Clone();
+
+                cloneLink.to = cloneNode.ID;
+
+                links.Add(cloneLink);
+            });
+
+
+            links.FindAll(x => x.from == node.ID).ForEach(x =>
+            {
+                Link cloneLink = x.Clone();
+
+                cloneLink.from = cloneNode.ID;
+
+                links.Add(cloneLink);
+            });
+
+            this.nodes.Add(cloneNode);
+        }
     }
 }

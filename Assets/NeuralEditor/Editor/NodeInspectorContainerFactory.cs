@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 public static class NodeInspectorContainerFactory
 {
@@ -16,5 +18,14 @@ public static class NodeInspectorContainerFactory
         container.configuration = configuration;
 
         return container;
+    }
+
+    public static NodeInspectorContainer[] CreateContainer(List<Node> selected_nodes, NetworkConfiguration configuration, NeuralEditorWindow window)
+    {
+        List<NodeInspectorContainer> nodeInspectorContainers = new List<NodeInspectorContainer>();
+
+        selected_nodes.ForEach(x => CreateContainer(x, configuration, window));
+
+        return nodeInspectorContainers.ToArray();
     }
 }
