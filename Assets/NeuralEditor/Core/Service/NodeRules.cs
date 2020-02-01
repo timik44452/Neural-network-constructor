@@ -20,13 +20,7 @@ namespace Core.Service
             Node node = new Node();
 
             node.Type = Type;
-
-            switch (Type)
-            {
-                case 0: node.color = ColorAtlas.gray; break;
-                case 1: node.color = ColorAtlas.gray; break;
-                case 2: node.color = ColorAtlas.gray; break;
-            }
+            node.color = ColorAtlas.white;
 
             return node;
         }

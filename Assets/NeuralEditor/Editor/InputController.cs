@@ -21,17 +21,16 @@ public class InputController
 
     public MouseMode mouseMode { get; private set; }
 
-    public bool isControl { get; private set; } = false;
-    public bool isShift { get; private set; } = false;
-    public bool isLeftMouse { get; private set; } = false;
-    public bool isRightMouse { get; private set; } = false;
-    public bool isMiddleMouse { get; private set; } = false;
-    public Vector2 mousePosition { get; private set; } = Vector2.zero;
-    public Vector2 delta { get; private set; } = Vector2.zero;
+    public bool isScroll { get; private set; }
+    public bool isControl { get; private set; }
+    public bool isShift { get; private set; }
 
-    private DateTime leftButtonTime = DateTime.Now;
-    private DateTime rightButtonTime = DateTime.Now;
-    private DateTime middleButtonTime = DateTime.Now;
+    public bool isLeftMouse { get; private set; }
+    public bool isRightMouse { get; private set; }
+    public bool isMiddleMouse { get; private set; }
+
+    public Vector2 mousePosition { get; private set; }
+    public Vector2 delta { get; private set; }
 
 
     public void Update()
@@ -71,5 +70,13 @@ public class InputController
         delta = eventCurrent.delta;
         isShift = eventCurrent.shift;
         isControl = eventCurrent.control;
+        isScroll = eventCurrent.isScrollWheel;
+    }
+
+    public void ResetMouseButtons()
+    {
+        isLeftMouse = false;
+        isRightMouse = false;
+        isMiddleMouse = false;
     }
 }

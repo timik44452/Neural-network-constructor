@@ -4,7 +4,14 @@ namespace Core.Service
 {
     public static class ViewportService
     {
-        public static Vector2 cameraPosition;
+        public static float Zoom
+        {
+            get => zoom;
+            set => zoom = Mathf.Clamp(value, 0.1F, 10F);
+        }
+        public static Vector2 cameraPosition { get; set; }
+
+        private static float zoom = 1F;
 
         public static Rect GetConnectionEllipse(bool isRight, Rect rect, bool localSpace = true)
         {
@@ -20,19 +27,18 @@ namespace Core.Service
 
         public static Rect ToSceneRect(Rect rect)
         {
-            rect.position += cameraPosition;
+            Matrix4x4 viewMatrix = new Matrix4x4(
+                new Vector4(zoom, 0, 0, 0),
+                new Vector4(0, zoom, 0, 0),
+                new Vector4(0, 0, zoom, 0),
+                new Vector4(cameraPosition.x, cameraPosition.y, 0, 1));
 
+            rect.position = viewMatrix.MultiplyPoint(rect.position);
+            
             return rect;
         }
 
-        public static Rect FromSceneRect(Rect rect)
-        {
-            rect.position -= cameraPosition;
-
-            return rect;
-        }
-
-        public static Vector2 FromScreenVector(Vector2 mousePosition)
+        public static Vector2 FromScreenPoint(Vector2 mousePosition)
         {
             mousePosition -= cameraPosition;
 

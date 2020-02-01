@@ -16,8 +16,6 @@ public class NeuralEditorWindow : EditorWindow
     private GUISkin nodeElipseSkin;
 
     private bool isBuildMode = false;
-    
-    private Vector3 cameraPosition;
 
     private List<Node> from_build_nodes;
     private List<Node> selected_nodes;
@@ -37,16 +35,14 @@ public class NeuralEditorWindow : EditorWindow
 
         InputHandler();
         DrawBackground();
-        DrawGrid(cameraPosition.z * grid_size, 0.3F, new Color(0.15F, 0.15F, 0.15F));
-        DrawGrid(cameraPosition.z * grid_size * 10, 0.66F, new Color(0.15F, 0.15F, 0.15F));
+        DrawGrid(grid_size, 0.3F, new Color(0.15F, 0.15F, 0.15F));
+        DrawGrid(grid_size * 10, 0.66F, new Color(0.15F, 0.15F, 0.15F));
         DrawLinks();
         DrawNodes();
     }
 
     public void ShowWindow()
     {
-        cameraPosition = Vector3.forward;
-
         if (nodeElipseSkin == null)
         {
             nodeElipseSkin = Resources.Load<GUISkin>("NodeEllipseSkin");
@@ -70,7 +66,7 @@ public class NeuralEditorWindow : EditorWindow
 
         if (inputController.OnMouseDown == null)
         {
-            inputController.OnMouseDown = MouseClick;
+            inputController.OnMouseDown = MouseDown;
         }
 
         if(inputController.OnMouseUp == null)
@@ -85,44 +81,36 @@ public class NeuralEditorWindow : EditorWindow
 
         inputController.Update();
 
-        Event eventCurrent = Event.current;
 
-        if (eventCurrent.type == EventType.MouseDrag)
+        if (inputController.isMiddleMouse)
         {
-            if (inputController.isMiddleMouse)
-            {
-                cameraPosition += new Vector3(eventCurrent.delta.x, eventCurrent.delta.y);
+            ViewportService.cameraPosition += inputController.delta;
 
-                Repaint();
-            }
+            Repaint();
         }
 
-        if (configuration != null && eventCurrent.type == EventType.MouseDown && eventCurrent.button == 1)
+        if(inputController.isScroll)
         {
-            if (createContextMenu == null)
-            {
-                createContextMenu = new GenericMenu();
+            //Zoom normalno ne rabotaet
+            //ViewportService.Zoom += inputController.delta.y * 0.01F;
 
-                foreach (var value in NodeRules.GetNodeList())
-                {
-                    createContextMenu.AddItem(new GUIContent(value.Key), false, () => CreateNode(value.Value));
-                }
-            }
-
-            createContextMenu.ShowAsContext();
+            Repaint();
         }
-
-        ViewportService.cameraPosition = cameraPosition;
     }
 
-    private void MouseClick()
+    private void MouseDown()
     {
-        bool isPointClick = false;
-        bool isNodeClick = false;
-        bool isLinkClick = false;
+        if(configuration == null)
+        {
+            return;
+        }
 
         if (inputController.isLeftMouse)
         {
+            bool isPointClick = false;
+            bool isNodeClick = false;
+            bool isLinkClick = false;
+
             foreach (Node node in configuration.nodes)
             {
                 if (ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, node.position, false)).Contains(inputController.mousePosition))
@@ -161,11 +149,33 @@ public class NeuralEditorWindow : EditorWindow
             }
         }
 
+        if (inputController.isRightMouse)
+        {
+            if (createContextMenu == null)
+            {
+                createContextMenu = new GenericMenu();
+
+                foreach (var value in NodeRules.GetNodeList())
+                {
+                    createContextMenu.AddItem(new GUIContent($"Create/{value.Key}"), false, () => CreateNode(value.Value));
+                }
+            }
+
+            inputController.ResetMouseButtons();
+
+            createContextMenu.ShowAsContext();
+        }
+
         Repaint();
     }
 
     private void MouseUp()
     {
+        if (configuration == null)
+        {
+            return;
+        }
+
         foreach (Node node in configuration.nodes)
         {
             if (ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, node.position, false)).Contains(inputController.mousePosition))
@@ -229,7 +239,7 @@ public class NeuralEditorWindow : EditorWindow
     {
         Node node = NodeRules.CreateNode(Type);
 
-        node.position = new Rect(ViewportService.FromScreenVector(inputController.mousePosition), new Vector2(100, 100));
+        node.position = new Rect(ViewportService.FromScreenPoint(inputController.mousePosition), new Vector2(100, 100));
 
         configuration?.AddNode(node);
     }
@@ -298,6 +308,11 @@ public class NeuralEditorWindow : EditorWindow
 
     private bool IsSelectedNode(Node node)
     {
+        if(selected_nodes == null)
+        {
+            return false;
+        }
+
         return selected_nodes.Contains(node);
     }
 
@@ -346,7 +361,7 @@ public class NeuralEditorWindow : EditorWindow
     #region Drawing service
     private void DrawNodes()
     {
-        float border = 2F;
+        float border = 4F;
 
         if (configuration == null)
         {
@@ -409,7 +424,7 @@ public class NeuralEditorWindow : EditorWindow
                 Vector2 vector_from = from_rect.position + from_rect.size * 0.5F;
                 Vector2 vector_to = to_rect.position + to_rect.size * 0.5F;
 
-                DrawCurve(2, vector_from, vector_to, new Color(0.55F, 0.55F, 0.55F, 0.6F), new Color(0, 1F, 1F, 0.6F));
+                DrawCurve(2, vector_from, vector_to, new Color(0.55F, 0.55F, 0.55F, 0.6F), new Color(0.55F, 0.55F, 0.55F, 0.6F));
             }
         }
 
@@ -441,8 +456,8 @@ public class NeuralEditorWindow : EditorWindow
 
         Handles.BeginGUI();
 
-        float offset_x = cameraPosition.x % gridSpacing;
-        float offset_y = cameraPosition.y % gridSpacing;
+        float offset_x = ViewportService.cameraPosition.x % gridSpacing;
+        float offset_y = ViewportService.cameraPosition.y % gridSpacing;
 
         Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, gridOpacity);
 
