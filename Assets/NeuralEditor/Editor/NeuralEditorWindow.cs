@@ -8,7 +8,7 @@ public class NeuralEditorWindow : EditorWindow
     private InputController inputController;
     private NetworkConfiguration configuration;
 
-    private GenericMenu createContextMenu;
+    private GenericMenu mainContextMenu;
     private GenericMenu nodeContextMenu;
 
     private GUISkin nodeSkin;
@@ -133,19 +133,19 @@ public class NeuralEditorWindow : EditorWindow
 
         if (inputController.isRightMouse)
         {
-            if (createContextMenu == null)
+            if (mainContextMenu == null)
             {
-                createContextMenu = new GenericMenu();
+                mainContextMenu = new GenericMenu();
 
                 foreach (var value in NodeRules.GetNodeList())
                 {
-                    createContextMenu.AddItem(new GUIContent($"Create/{value.Key}"), false, () => CreateNode(value.Value));
+                    mainContextMenu.AddItem(new GUIContent($"Create/{value.Key}"), false, () => CreateNode(value.Value));
                 }
             }
 
             inputController.ResetMouseButtons();
 
-            createContextMenu.ShowAsContext();
+            mainContextMenu.ShowAsContext();
         }
 
         Repaint();

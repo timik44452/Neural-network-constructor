@@ -12,14 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b19e62d592fd5468e1a30c38a142e8, type: 3}
   m_Name: Configuration
   m_EditorClassIdentifier: 
-  links: []
+  links:
+  - from: 0
+    to: 2
+  - from: 1
+    to: 2
+  - from: 2
+    to: 3
+  - from: 0
+    to: 4
+  - from: 1
+    to: 4
+  - from: 4
+    to: 3
+  - from: 0
+    to: 5
+  - from: 1
+    to: 5
+  - from: 5
+    to: 3
+  - from: 0
+    to: 6
+  - from: 1
+    to: 6
+  - from: 6
+    to: 3
+  - from: 0
+    to: 7
+  - from: 1
+    to: 7
+  - from: 7
+    to: 3
   nodes:
   - ID: 0
     Type: 0
     position:
       serializedVersion: 2
-      x: 309.1579
-      y: 346.18927
+      x: 298.1579
+      y: 389.18927
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -27,7 +57,7 @@ MonoBehaviour:
     Type: 0
     position:
       serializedVersion: 2
-      x: 304
+      x: 298.5
       y: 486
       width: 100
       height: 100
@@ -36,8 +66,8 @@ MonoBehaviour:
     Type: 2
     position:
       serializedVersion: 2
-      x: 472.5
-      y: 290.5
+      x: 492.5
+      y: 243
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -45,8 +75,53 @@ MonoBehaviour:
     Type: 1
     position:
       serializedVersion: 2
-      x: 626
-      y: 433
+      x: 727.5
+      y: 431.5
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 4
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 493.7107
+      y: 338.7107
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 5
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 494.9214
+      y: 436.9214
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 6
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 500.34277
+      y: 632.3428
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 7
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 497.63208
+      y: 536.6321
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 8
+    Type: 0
+    position:
+      serializedVersion: 2
+      x: 788
+      y: 624
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
