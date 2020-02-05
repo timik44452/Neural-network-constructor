@@ -9,7 +9,7 @@
 
         protected override void CounterInvokeInput(float value)
         {
-            Value = (float)(1.0 / (1.0 + System.Math.Exp(-2 * value)));
+            Value = (float)(1.0 / (1.0 + System.Math.Exp(-value)));
         }
 
         protected override void CounterInvokeLern(float rate, float value)

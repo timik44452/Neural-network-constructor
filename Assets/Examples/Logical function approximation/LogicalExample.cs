@@ -1,6 +1,9 @@
 ﻿using Core.Neurons;
 using System.Collections;
+
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class LogicalExample : MonoBehaviour
 {
@@ -27,31 +30,61 @@ public class LogicalExample : MonoBehaviour
 
     public NetworkConfiguration configuration;
 
-    public Function function = Function.AND;
-
     public float learningRate = 0.01F;
 
+    public Text[] out_texts;
+
     #region Hide
+
+    private Function function = Function.AND;
 
     private Executor executor;
     private Core.Service.ILogger logger;
     private Core.Service.INodeConvertor<Neuron> convertor;
 
-    private Coroutine thread;
+    private Coroutine learning_thread;
+    private Coroutine visualization_thread;
 
     #endregion Hide
 
     public void Run()
     {
-        if (thread == null)
+        if (learning_thread != null)
         {
-            thread = StartCoroutine(Thread());
+            StopCoroutine(learning_thread);
         }
-        else
+
+        if (visualization_thread != null)
         {
-            StopCoroutine(thread);
-            thread = null;
+            StopCoroutine(visualization_thread);
         }
+
+        learning_thread = StartCoroutine(LearningThread());
+        visualization_thread = StartCoroutine(VisualizationThread());
+    }
+
+    public void Stop()
+    {
+        if (learning_thread != null)
+        {
+            StopCoroutine(learning_thread);
+        }
+
+        if (visualization_thread != null)
+        {
+            StopCoroutine(visualization_thread);
+        }
+
+        learning_thread = null;
+        visualization_thread = null;
+    }
+
+    public void ChangeFunction(int functionIndex)
+    {
+        function = (Function)functionIndex;
+
+        Stop();
+        Run();
     }
 
     private void Start()
@@ -60,9 +93,11 @@ public class LogicalExample : MonoBehaviour
         convertor = new NodeToNeuronConvertor();
 
         executor = new Executor(logger, convertor, configuration);
+
+        Run();
     }
 
-    private IEnumerator Thread()
+    private IEnumerator LearningThread()
     {
         LernData[] dataset = GetDataset();
 
@@ -75,6 +110,32 @@ public class LogicalExample : MonoBehaviour
             }
 
             yield return new WaitForSeconds(0.01F);
+        }
+    }
+
+    private IEnumerator VisualizationThread()
+    {
+        LernData[] dataset = GetDataset();
+
+        for (int i = 0; i < dataset.Length; i++)
+        {
+            out_texts[i * 3].text = dataset[i].input0.ToString();
+            out_texts[i * 3 + 1].text = dataset[i].input1.ToString();
+        }
+
+        while (true)
+        {
+            for (int line = 0; line < dataset.Length; line++)
+            {
+                LernData data = dataset[line];
+                executor.Invoke(data.input0, data.input1);
+
+                executor.GetOutput(out float[] output);
+
+                out_texts[line * 3 + 2].text = output[0].ToString("0.00");
+            }
+
+            yield return new WaitForSeconds(0.25F);
         }
     }
 

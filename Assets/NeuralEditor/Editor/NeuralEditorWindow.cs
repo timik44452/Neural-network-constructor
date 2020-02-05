@@ -8,9 +8,6 @@ public class NeuralEditorWindow : EditorWindow
     private InputController inputController;
     private NetworkConfiguration configuration;
 
-    private GenericMenu mainContextMenu;
-    private GenericMenu nodeContextMenu;
-
     private GUISkin nodeSkin;
     private GUISkin nodeElipseSkin;
 
@@ -41,6 +38,12 @@ public class NeuralEditorWindow : EditorWindow
         DrawGrid(grid_size * 10, 0.66F, new Color(0.15F, 0.15F, 0.15F));
         DrawLinks();
         DrawNodes();
+
+        if (GUIContextMenu.IsOpened)
+        {
+            GUIContextMenu.Draw();
+            Repaint();
+        }
     }
 
     #region Input
@@ -133,19 +136,8 @@ public class NeuralEditorWindow : EditorWindow
 
         if (inputController.isRightMouse)
         {
-            if (mainContextMenu == null)
-            {
-                mainContextMenu = new GenericMenu();
-
-                foreach (var value in NodeRules.GetNodeList())
-                {
-                    mainContextMenu.AddItem(new GUIContent($"Create/{value.Key}"), false, () => CreateNode(value.Value));
-                }
-            }
-
-            inputController.ResetMouseButtons();
-
-            mainContextMenu.ShowAsContext();
+            GUIContextMenu.Show(inputController.mousePosition,
+                new GUIControls.MenuItem("Create", () => CreateNode(0, GUIContextMenu.Position)));
         }
 
         Repaint();
@@ -222,11 +214,11 @@ public class NeuralEditorWindow : EditorWindow
 
     #region Node service
 
-    private void CreateNode(int Type)
+    private void CreateNode(int Type, Vector2 position)
     {
         Node node = NodeRules.CreateNode(Type);
 
-        node.position = new Rect(ViewportService.FromScreenPoint(inputController.mousePosition), new Vector2(100, 100));
+        node.position = new Rect(ViewportService.FromScreenPoint(position), new Vector2(100, 100));
 
         configuration?.AddNode(node);
     }

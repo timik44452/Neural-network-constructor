@@ -9,23 +9,22 @@
 
         protected override void CounterInvokeInput(float value)
         {
-            Value = (float)(1.0 / (1.0 + System.Math.Exp(-2 * value)));
+            Value = (float)(1.0 / (1.0 + System.Math.Exp(-value)));
 
             Propagate(Value);
         }
 
-        protected override void CounterInvokeLern(float rate, float value)
+        protected override void CounterInvokeLern(float rate, float delta)
         {
-            float delta = value * Value * (1 - Value);
+            float local_delta = delta * Value * (1 - Value);
 
             foreach (var link in input_weights)
             {
-                float weight_delta = delta * link.source.Value;
+                link.weight += rate * link.weight * local_delta;
 
-                link.weight += rate * weight_delta;
-
-                link.source.Lern(rate, weight_delta);
+                link.source.Lern(rate, local_delta);
             }
+
         }
     }
 }

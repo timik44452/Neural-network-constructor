@@ -14,9 +14,9 @@
             Propagate(value);
         }
 
-        protected override void CounterInvokeLern(float rate, float value)
+        protected override void CounterInvokeLern(float rate, float delta)
         {
-            
+
         }
     }
 }

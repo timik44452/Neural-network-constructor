@@ -16,8 +16,8 @@ namespace Core.Neurons
         public List<NeuronLink> out_weights;
         public List<NeuronLink> input_weights;
 
-        protected int counter = 0;
-        protected float summ = 0;
+        private int counter = 0;
+        private float summ = 0;
 
 
         public Neuron()
@@ -30,10 +30,7 @@ namespace Core.Neurons
         protected abstract void CounterInvokeLern(float rate, float value);
         protected void Propagate(float value)
         {
-            foreach (var link in out_weights)
-            {
-                link.destination.Input(value * link.weight);
-            }
+            out_weights.ForEach(link => link.destination.Input(value * link.weight));
         }
 
         public void Input(float value)
