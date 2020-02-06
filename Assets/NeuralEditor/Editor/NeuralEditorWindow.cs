@@ -137,7 +137,10 @@ public class NeuralEditorWindow : EditorWindow
         if (inputController.isRightMouse)
         {
             GUIContextMenu.Show(inputController.mousePosition,
-                new GUIControls.MenuItem("Create", () => CreateNode(0, GUIContextMenu.Position)));
+                new GUIControls.MenuItem("Create/Entry", () => CreateNode(0, GUIContextMenu.Position)),
+                new GUIControls.MenuItem("Create/Out", () => CreateNode(1, GUIContextMenu.Position)),
+                new GUIControls.MenuItem("Create/Sigmoid", () => CreateNode(2, GUIContextMenu.Position)),
+                new GUIControls.MenuItem("Create/Bias", () => CreateNode(3, GUIContextMenu.Position)));
         }
 
         Repaint();

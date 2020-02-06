@@ -11,6 +11,7 @@ namespace Core.Service
             nodes.Add("Entry node", 0);
             nodes.Add("Out node", 1);
             nodes.Add("Sigmoid node", 2);
+            nodes.Add("Bias node", 3);
 
             return nodes;
         }

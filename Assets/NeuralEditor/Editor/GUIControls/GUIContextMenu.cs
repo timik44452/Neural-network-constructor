@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 using GUIControls;
+using System;
 
 public class GUIContextMenu
 {
@@ -14,7 +16,7 @@ public class GUIContextMenu
     private static Rect s_findBoxRect;
     private static Rect s_buttonRect;
 
-    private static MenuItem[] s_menuItems;
+    private static  MenuItemsTree s_menuItemsTree;
 
     private static GUISkin s_skin;
     private static string searchText;
@@ -27,8 +29,8 @@ public class GUIContextMenu
         s_contextRect = new Rect(position, new Vector2(200, 270));
         s_skin = Resources.Load<GUISkin>("Skins/ContextMenuSkin");
 
-        s_menuItems = menuItems;
-
+        s_menuItemsTree = new MenuItemsTree(menuItems);
+        
         CalculateBounds();
     }
 
@@ -45,15 +47,26 @@ public class GUIContextMenu
             GUI.Box(s_contextRect, "");
             searchText = GUI.TextField(s_findBoxRect, searchText);
 
-            for (int i = 0; i < s_menuItems.Length; i++)
+            for (int i = 0; i < s_menuItemsTree.ChildNodesCount(); i++)
             {
-                if (GUI.Button(s_buttonRect, s_menuItems[i].Name))
+                Rect rect = new Rect(s_buttonRect.x, s_buttonRect.y + s_buttonRect.height * i, s_buttonRect.width, s_buttonRect.height);
+
+                if (GUI.Button(rect, s_menuItemsTree.GetItem(i).Name))
                 {
-                    s_isOpened = false;
-                    s_menuItems[i].Invoke();
+                    s_menuItemsTree.GetItem(i).Invoke();
                 }
             }
         }
+    }
+
+    public static void Close()
+    {
+        s_isOpened = false;
+    }
+
+    private static void CreteLevelTree(MenuItem[] menuItems)
+    {
+
     }
 
     private static void CalculateBounds()

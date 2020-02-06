@@ -14,68 +14,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   links:
   - from: 0
-    to: 4
+    to: 13
   - from: 1
-    to: 4
-  - from: 0
-    to: 5
-  - from: 1
-    to: 5
-  - from: 0
-    to: 6
-  - from: 1
-    to: 6
-  - from: 0
-    to: 7
-  - from: 1
-    to: 7
-  - from: 4
-    to: 8
-  - from: 5
-    to: 8
-  - from: 7
-    to: 8
-  - from: 6
-    to: 8
-  - from: 4
-    to: 9
-  - from: 5
-    to: 9
-  - from: 7
-    to: 9
-  - from: 6
-    to: 9
-  - from: 4
-    to: 10
-  - from: 5
-    to: 10
-  - from: 7
-    to: 10
-  - from: 6
-    to: 10
-  - from: 4
-    to: 11
-  - from: 5
-    to: 11
-  - from: 7
-    to: 11
-  - from: 6
-    to: 11
-  - from: 8
+    to: 13
+  - from: 13
     to: 12
-  - from: 11
+  - from: 0
+    to: 14
+  - from: 1
+    to: 14
+  - from: 14
     to: 12
-  - from: 10
+  - from: 0
+    to: 15
+  - from: 1
+    to: 15
+  - from: 15
     to: 12
-  - from: 9
+  - from: 0
+    to: 17
+  - from: 1
+    to: 17
+  - from: 17
+    to: 12
+  - from: 0
+    to: 18
+  - from: 1
+    to: 18
+  - from: 18
     to: 12
   nodes:
   - ID: 0
     Type: 0
     position:
       serializedVersion: 2
-      x: 298.1579
-      y: 389.18927
+      x: 301.92285
+      y: 400.33328
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -83,80 +57,8 @@ MonoBehaviour:
     Type: 0
     position:
       serializedVersion: 2
-      x: 298.5
-      y: 486
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 4
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 497.72598
-      y: 284.03644
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 5
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 492.9214
-      y: 376.9214
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 6
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 490.06207
-      y: 615.189
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 7
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 491.63208
-      y: 513.6321
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 8
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 725.5
-      y: 284.5
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 9
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 719.1321
-      y: 614.1321
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 10
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 724.4214
-      y: 511.9214
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 11
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 719.7107
-      y: 388.7107
+      x: 299.4191
+      y: 484.2385
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -164,17 +66,62 @@ MonoBehaviour:
     Type: 1
     position:
       serializedVersion: 2
-      x: 918.5
-      y: 459.5
+      x: 676.5
+      y: 426.5
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 13
-    Type: 0
+    Type: 2
     position:
       serializedVersion: 2
-      x: 258
-      y: 177
+      x: 479.87964
+      y: 267.985
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 14
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 486.15833
+      y: 610.24634
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 15
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 483.94113
+      y: 524.1861
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 17
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 480.82712
+      y: 346.6147
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 18
+    Type: 2
+    position:
+      serializedVersion: 2
+      x: 482.4214
+      y: 438.9214
+      width: 100
+      height: 100
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - ID: 19
+    Type: 3
+    position:
+      serializedVersion: 2
+      x: 524
+      y: 712
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}

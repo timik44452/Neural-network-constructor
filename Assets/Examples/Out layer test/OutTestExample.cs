@@ -23,9 +23,9 @@ public class OutTestExample : MonoBehaviour
 
     public enum Function
     {
-        AND,
-        OR,
-        XOR
+        _1_0_0,
+        _0_1_0,
+        _05_05_05
     }
 
     public NetworkConfiguration configuration;
@@ -36,7 +36,7 @@ public class OutTestExample : MonoBehaviour
 
     #region Hide
 
-    private Function function = Function.AND;
+    private Function function = Function._1_0_0;
 
     private Executor executor;
     private Core.Service.ILogger logger;
@@ -143,19 +143,19 @@ public class OutTestExample : MonoBehaviour
     {
         switch (function)
         {
-            case Function.AND:
+            case Function._1_0_0:
                 return new LernData[]
                 {
                     new LernData(1, 0, 0),
                 };
 
-            case Function.OR:
+            case Function._0_1_0:
                 return new LernData[]
                 {
                     new LernData(0, 1, 0),
                 };
 
-            case Function.XOR:
+            case Function._05_05_05:
                 return new LernData[]
                 {
                     new LernData(0.5F, 0.5F, 0.5F),

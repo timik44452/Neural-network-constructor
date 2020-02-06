@@ -24,7 +24,6 @@
 
                 link.source.Lern(rate, local_delta);
             }
-
         }
     }
 }

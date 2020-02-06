@@ -594,7 +594,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: AND
+  m_Text: 1 0 0
 --- !u!222 &309657399
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1868,11 +1868,11 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: AND
+    - m_Text: 1 0 0
       m_Image: {fileID: 0}
-    - m_Text: OR
+    - m_Text: 0 1 0
       m_Image: {fileID: 0}
-    - m_Text: XOR
+    - m_Text: 0.5 0.5 0.5
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

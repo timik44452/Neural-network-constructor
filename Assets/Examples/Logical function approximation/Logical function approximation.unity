@@ -427,7 +427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configuration: {fileID: 11400000, guid: d7cd7dbae696c57488479d438fe30455, type: 2}
-  learningRate: 0.01
+  learningRate: 1
   out_texts:
   - {fileID: 1265805770}
   - {fileID: 819638846}
