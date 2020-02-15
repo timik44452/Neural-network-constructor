@@ -16,13 +16,13 @@
 
         protected override void CounterInvokeLern(float rate, float delta)
         {
-            float local_delta = delta * Value * (1 - Value);
+            float weight_delta = rate * delta * Value * (1 - Value);
 
             foreach (var link in input_weights)
             {
-                link.weight += rate * link.weight * local_delta;
+                link.weight += link.source.Value * link.weight * weight_delta;
 
-                link.source.Lern(rate, local_delta);
+                link.source.Lern(rate, link.weight * delta);
             }
         }
     }

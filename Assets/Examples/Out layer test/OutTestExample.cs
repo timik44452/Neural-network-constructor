@@ -28,6 +28,9 @@ public class OutTestExample : MonoBehaviour
         _05_05_05
     }
 
+    public float a;
+    public float b;
+
     public NetworkConfiguration configuration;
 
     public float learningRate = 0.01F;
@@ -99,14 +102,18 @@ public class OutTestExample : MonoBehaviour
 
     private IEnumerator LearningThread()
     {
-        LernData[] dataset = GetDataset();
+        //LernData[] dataset = GetDataset();
 
         while (true)
         {
-            foreach (var data in dataset)
+            //foreach (var data in dataset)
             {
-                executor.Invoke(data.input0, data.input1);
-                executor.Lern(learningRate, data.result);
+                float a = Random.value;
+                float b = Random.value;
+                float c = (a + b) * 0.5F;
+
+                executor.Invoke(a, b);
+                executor.Lern(learningRate, c);
             }
 
             yield return new WaitForSeconds(0.01F);
@@ -115,24 +122,24 @@ public class OutTestExample : MonoBehaviour
 
     private IEnumerator VisualizationThread()
     {
-        LernData[] dataset = GetDataset();
+        //LernData[] dataset = GetDataset();
 
-        for (int i = 0; i < dataset.Length; i++)
-        {
-            out_texts[i * 3].text = dataset[i].input0.ToString();
-            out_texts[i * 3 + 1].text = dataset[i].input1.ToString();
-        }
+        //for (int i = 0; i < dataset.Length; i++)
+        //{
+        //    out_texts[i * 3].text = dataset[i].input0.ToString();
+        //    out_texts[i * 3 + 1].text = dataset[i].input1.ToString();
+        //}
 
         while (true)
         {
-            for (int line = 0; line < dataset.Length; line++)
+            //for (int line = 0; line < dataset.Length; line++)
             {
-                LernData data = dataset[line];
-                executor.Invoke(data.input0, data.input1);
+                //LernData data = dataset[line];
+                executor.Invoke(a, b);
 
                 executor.GetOutput(out float[] output);
 
-                out_texts[line * 3 + 2].text = output[0].ToString("0.00");
+                out_texts[2].text = output[0].ToString("0.00");
             }
 
             yield return new WaitForSeconds(0.25F);

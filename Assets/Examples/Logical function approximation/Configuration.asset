@@ -17,32 +17,6 @@ MonoBehaviour:
     to: 13
   - from: 1
     to: 13
-  - from: 13
-    to: 12
-  - from: 0
-    to: 14
-  - from: 1
-    to: 14
-  - from: 14
-    to: 12
-  - from: 0
-    to: 15
-  - from: 1
-    to: 15
-  - from: 15
-    to: 12
-  - from: 0
-    to: 17
-  - from: 1
-    to: 17
-  - from: 17
-    to: 12
-  - from: 0
-    to: 18
-  - from: 1
-    to: 18
-  - from: 18
-    to: 12
   nodes:
   - ID: 0
     Type: 0
@@ -62,21 +36,12 @@ MonoBehaviour:
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 12
-    Type: 1
-    position:
-      serializedVersion: 2
-      x: 676.5
-      y: 426.5
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 13
     Type: 2
     position:
       serializedVersion: 2
       x: 479.87964
-      y: 267.985
+      y: 257.985
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -84,44 +49,17 @@ MonoBehaviour:
     Type: 2
     position:
       serializedVersion: 2
-      x: 486.15833
-      y: 610.24634
+      x: 621.5
+      y: 256.5
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 15
-    Type: 2
+    Type: 1
     position:
       serializedVersion: 2
-      x: 483.94113
-      y: 524.1861
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 17
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 480.82712
-      y: 346.6147
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 18
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 482.4214
-      y: 438.9214
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 19
-    Type: 3
-    position:
-      serializedVersion: 2
-      x: 524
-      y: 712
+      x: 687
+      y: 427
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}

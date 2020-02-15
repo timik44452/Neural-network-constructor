@@ -5,11 +5,22 @@ using UnityEngine;
 
 public class NeuralEditorWindow : EditorWindow
 {
+    private enum EditorState
+    {
+        Waiting,
+        Multiselect
+    }
+
+    private EditorState editorState = EditorState.Waiting;
+
     private InputController inputController;
     private NetworkConfiguration configuration;
 
     private GUISkin nodeSkin;
     private GUISkin nodeElipseSkin;
+
+    private Vector2 multiselection_start;
+    private Rect multiselect_region;
 
     private List<Node> from_build_nodes;
     private List<Node> selected_nodes;
@@ -38,6 +49,12 @@ public class NeuralEditorWindow : EditorWindow
         DrawGrid(grid_size * 10, 0.66F, new Color(0.15F, 0.15F, 0.15F));
         DrawLinks();
         DrawNodes();
+        DrawSelectRegion();
+
+        if (editorState == EditorState.Multiselect)
+        {
+            Repaint();
+        }
 
         if (GUIContextMenu.IsOpened)
         {
@@ -98,7 +115,7 @@ public class NeuralEditorWindow : EditorWindow
 
             foreach (Node node in configuration.nodes)
             {
-                if (ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, node.position, false)).Contains(inputController.mousePosition))
+                if (ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(true, node.position, false)).Contains(inputController.mousePosition))
                 {
                     isPointClick = true;
 
@@ -112,10 +129,8 @@ public class NeuralEditorWindow : EditorWindow
             {
                 foreach (Node node in configuration.nodes)
                 {
-                    if (ViewportService.ToSceneRect(node.position).Contains(inputController.mousePosition))
+                    if (ViewportService.ToScreenRect(node.position).Contains(inputController.mousePosition))
                     {
-                        SelectOrDeselectNode(node);
-
                         isNodeClick = true;
 
                         break;
@@ -130,7 +145,7 @@ public class NeuralEditorWindow : EditorWindow
 
             if (isNodeClick == false && isLinkClick == false && isPointClick == false)
             {
-                ClickOnBackground();
+                ClickDownOnBackground();
             }
         }
 
@@ -153,15 +168,43 @@ public class NeuralEditorWindow : EditorWindow
             return;
         }
 
+        bool isPointClick = false;
+        bool isNodeClick = false;
+        bool isLinkClick = false;
+
         foreach (Node node in configuration.nodes)
         {
-            if (ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, node.position, false)).Contains(inputController.mousePosition))
+            if (ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(false, node.position, false)).Contains(inputController.mousePosition))
             {
+                isPointClick = true;
+
                 EndBuild(node);
 
                 break;
             }
         }
+
+        if (isPointClick == false)
+        {
+            foreach (Node node in configuration.nodes)
+            {
+                if (ViewportService.ToScreenRect(node.position).Contains(inputController.mousePosition))
+                {
+                    isNodeClick = true;
+
+                    SelectOrDeselectNode(node);
+
+                    break;
+                }
+            }
+        }
+
+        if (isNodeClick == false && isLinkClick == false && isPointClick == false)
+        {
+            ClickUpOnBackground();
+        }
+
+        EndMultiselect();
 
         Repaint();
     }
@@ -207,7 +250,12 @@ public class NeuralEditorWindow : EditorWindow
         Repaint();
     }
 
-    private void ClickOnBackground()
+    private void ClickDownOnBackground()
+    {
+        BeginMultiselect();
+    }
+
+    private void ClickUpOnBackground()
     {
         DeselectAll();
         EndBuild();
@@ -294,10 +342,25 @@ public class NeuralEditorWindow : EditorWindow
 
     private void BeginMultiselect()
     {
+        multiselection_start = inputController.mousePosition;
+
+         editorState = EditorState.Multiselect;
     }
 
     private void EndMultiselect()
     {
+        if (configuration != null)
+        {
+            configuration.nodes.ForEach(node =>
+            {
+                if (IsSelectedNode(node) && !selected_nodes.Contains(node))
+                {
+                    selected_nodes.Add(node);
+                }
+            });
+        }
+
+        editorState = EditorState.Waiting;
     }
 
     private void SelectOrDeselectNode(Node node)
@@ -331,7 +394,9 @@ public class NeuralEditorWindow : EditorWindow
 
     private bool IsSelectedNode(Node node)
     {
-        return selected_nodes.Contains(node);
+        return
+            editorState == EditorState.Multiselect && multiselect_region.Contains(ViewportService.ToScreenPoint(node.position.center)) ||
+            selected_nodes.Contains(node);
     }
 
     #endregion Node service
@@ -385,8 +450,6 @@ public class NeuralEditorWindow : EditorWindow
             return;
         }
 
-        BeginWindows();
-
         foreach (Node node in configuration.nodes)
         {
             GUI.skin = nodeSkin;
@@ -399,7 +462,7 @@ public class NeuralEditorWindow : EditorWindow
                     ColorAtlas.orange.b,
                     0.55F);
 
-                Rect selection_rect = ViewportService.ToSceneRect(node.position);
+                Rect selection_rect = ViewportService.ToScreenRect(node.position);
 
                 selection_rect.x -= border_width * 0.5F;
                 selection_rect.y -= border_width * 0.5F;
@@ -409,12 +472,12 @@ public class NeuralEditorWindow : EditorWindow
                 GUI.Box(selection_rect, "");
             }
 
-            var right_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, node.position, false));
-            var left_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, node.position, false));
+            var right_rect = ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(true, node.position, false));
+            var left_rect = ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(false, node.position, false));
 
             GUI.color = node.color;
 
-            GUI.Box(ViewportService.ToSceneRect(node.position), "");
+            GUI.Box(ViewportService.ToScreenRect(node.position), "");
 
             GUI.color = new Color(0, 1F, 1F, 0.3F);
             GUI.skin = nodeElipseSkin;
@@ -429,7 +492,7 @@ public class NeuralEditorWindow : EditorWindow
                 GUI.Box(left_rect, "");
             }
 
-            if (IsSelectedNode(node) && inputController.isLeftMouse)
+            if (editorState == EditorState.Waiting && inputController.isLeftMouse && IsSelectedNode(node))
             {
                 node.position.position += inputController.delta * 0.5F;
 
@@ -438,8 +501,33 @@ public class NeuralEditorWindow : EditorWindow
                 Repaint();
             }
         }
+    }
 
-        EndWindows();
+    private void DrawSelectRegion()
+    {
+        if (editorState == EditorState.Multiselect)
+        {
+            GUI.skin = null;
+
+            Vector2 position = multiselection_start;
+            Vector2 size = inputController.mousePosition - multiselection_start;
+
+            if (size.x < 0)
+            {
+                position += Vector2.right * size.x;
+                size.x = Mathf.Abs(size.x);
+            }
+
+            if (size.y < 0)
+            {
+                position += Vector2.up * size.y;
+                size.y = Mathf.Abs(size.y);
+            }
+
+            multiselect_region = new Rect(position, size);
+
+            GUI.Box(multiselect_region, "");
+        }
     }
 
     private void DrawLinks()
@@ -456,8 +544,8 @@ public class NeuralEditorWindow : EditorWindow
 
             if (from != null && to != null)
             {
-                Rect from_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, from.position, false));
-                Rect to_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(false, to.position, false));
+                Rect from_rect = ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(true, from.position, false));
+                Rect to_rect = ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(false, to.position, false));
 
                 Vector2 from_point = from_rect.position + new Vector2(to_rect.size.x, to_rect.size.y * 0.5F);
                 Vector2 to_point = to_rect.position + new Vector2(0, to_rect.size.y * 0.5F);
@@ -470,7 +558,7 @@ public class NeuralEditorWindow : EditorWindow
         {
             from_build_nodes.ForEach(x =>
             {
-                Rect from_rect = ViewportService.ToSceneRect(ViewportService.GetConnectionEllipse(true, x.position, false));
+                Rect from_rect = ViewportService.ToScreenRect(ViewportService.GetConnectionEllipse(true, x.position, false));
 
                 Vector2 from = from_rect.position + from_rect.size * 0.5F;
 

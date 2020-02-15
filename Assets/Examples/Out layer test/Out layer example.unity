@@ -346,8 +346,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 911a1883a0adb014d8fe368a0ecd0f02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  a: 0
+  b: 0.25
   configuration: {fileID: 11400000, guid: 65a5a9a4343acb6479e704cae87012df, type: 2}
-  learningRate: 1
+  learningRate: 0.01
   out_texts:
   - {fileID: 1265805770}
   - {fileID: 819638846}

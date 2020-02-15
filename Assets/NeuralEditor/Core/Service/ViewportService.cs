@@ -25,7 +25,7 @@ namespace Core.Service
             return new Rect(point.x - size * 0.5F, point.y - size * 0.5F, size, size);
         }
 
-        public static Rect ToSceneRect(Rect rect)
+        public static Rect ToScreenRect(Rect rect)
         {
             Matrix4x4 viewMatrix = new Matrix4x4(
                 new Vector4(zoom, 0, 0, 0),
@@ -38,11 +38,18 @@ namespace Core.Service
             return rect;
         }
 
-        public static Vector2 FromScreenPoint(Vector2 mousePosition)
+        public static Vector2 ToScreenPoint(Vector2 point)
         {
-            mousePosition -= cameraPosition;
+            point += cameraPosition;
 
-            return mousePosition;
+            return point;
+        }
+
+        public static Vector2 FromScreenPoint(Vector2 point)
+        {
+            point -= cameraPosition;
+
+            return point;
         }
     }
 }
