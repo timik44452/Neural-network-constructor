@@ -1,4 +1,6 @@
-﻿namespace Core.Neurons
+﻿using System.Linq;
+
+namespace Core.Neurons
 {
     public class EntryNeuron : Neuron
     {
@@ -7,16 +9,24 @@
 
         }
 
-        protected override void CounterInvokeInput(float value)
+        public override void CalculateGradient(float target)
         {
-            Value = value;
-
-            Propagate(value);
+            Gradient = out_synapse.Sum(a => a.destination.Gradient * a.weight) * Derivative(Value);
         }
 
-        protected override void CounterInvokeLern(float rate, float value)
+        protected override void CounterInvokeInput()
+        {
+            Propagate();
+        }
+
+        protected override void CounterInvokeLern(float rate)
         {
             
+        }
+
+        private float Derivative(float x)
+        {
+            return x * (1 - x);
         }
     }
 }

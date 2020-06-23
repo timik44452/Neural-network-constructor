@@ -1,4 +1,7 @@
-﻿namespace Core.Neurons
+﻿using System.Linq;
+using UnityEngine;
+
+namespace Core.Neurons
 {
     public class SigmoidNeuron : Neuron
     {
@@ -7,25 +10,32 @@
 
         }
 
-        protected override void CounterInvokeInput(float value)
+        public override void CalculateGradient(float target)
         {
-            Value = (float)(1.0 / (1.0 + System.Math.Exp(-2 * value)));
-
-            Propagate(Value);
+            Gradient = out_synapse.Sum(a => a.destination.Gradient * a.weight) * Derivative(Value);
         }
 
-        protected override void CounterInvokeLern(float rate, float value)
+        protected override void CounterInvokeInput()
         {
-            float delta = value * Value * (1 - Value);
+            Value = ActivationFunction(input_synapse.Sum(x => x.weight * x.source.Value));
 
-            foreach (var link in input_weights)
-            {
-                float weight_delta = delta * link.source.Value;
+            Propagate();
+        }
 
-                link.weight += rate * weight_delta;
+        protected override void CounterInvokeLern(float rate)
+        {
+            
+        }
 
-                link.source.Lern(rate, weight_delta);
-            }
+
+        private float ActivationFunction(float value)
+        {
+            return value < -45.0F ? 0.0F : value > 45.0F ? 1.0F : 1.0F / (1.0F + Mathf.Exp((float)-value));
+        }
+
+        private float Derivative(float x)
+        {
+            return x * (1 - x);
         }
     }
 }

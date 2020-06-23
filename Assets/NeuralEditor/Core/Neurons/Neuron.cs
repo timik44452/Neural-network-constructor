@@ -8,54 +8,64 @@ namespace Core.Neurons
     {
         public int ID;
 
-        public int InputCount { get => input_weights.Count; }
-        public int OutputCount { get => out_weights.Count; }
+        public int InputCount { get => input_synapse.Count; }
+        public int OutputCount { get => out_synapse.Count; }
 
         public float Value;
+        public float Gradient;
 
-        public List<NeuronLink> out_weights;
-        public List<NeuronLink> input_weights;
+        public List<NeuronLink> out_synapse;
+        public List<NeuronLink> input_synapse;
 
         protected int counter = 0;
-        protected float summ = 0;
-
 
         public Neuron()
         {
-            out_weights = new List<NeuronLink>();
-            input_weights = new List<NeuronLink>();
+            out_synapse = new List<NeuronLink>();
+            input_synapse = new List<NeuronLink>();
         }
 
-        protected abstract void CounterInvokeInput(float value);
-        protected abstract void CounterInvokeLern(float rate, float value);
-        protected void Propagate(float value)
+        public abstract void CalculateGradient(float target);
+        public void UpdateWeights(float learnRate)
         {
-            foreach (var link in out_weights)
+            float prevDelta;
+
+            foreach (var synapse in input_synapse)
             {
-                link.destination.Input(value * link.weight);
+                prevDelta = synapse.WeightDelta;
+                synapse.WeightDelta = learnRate * Gradient * synapse.source.Value;
+                synapse.weight += synapse.WeightDelta + prevDelta;
             }
         }
 
-        public void Input(float value)
+        protected abstract void CounterInvokeInput();
+        protected abstract void CounterInvokeLern(float rate);
+        protected void Propagate()
+        {
+            foreach (var link in out_synapse)
+            {
+                link.destination.Input();
+            }
+        }
+
+        public void Input()
         {
             counter++;
-            summ += value;
 
             if (counter >= InputCount)
             {
-                CounterInvokeInput(summ);
+                CounterInvokeInput();
                 Reset();
             }
         }
 
-        public void Lern(float rate, float value)
+        public void Lern(float rate)
         {
             counter++;
-            summ += value;
 
             if (counter >= OutputCount)
             {
-                CounterInvokeLern(rate, summ);
+                CounterInvokeLern(rate);
                 Reset();
             }
         }
@@ -63,7 +73,6 @@ namespace Core.Neurons
         public void Reset()
         {
             counter = 0;
-            summ = 0;
         }
     }
 }

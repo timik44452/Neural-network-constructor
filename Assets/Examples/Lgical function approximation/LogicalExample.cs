@@ -25,6 +25,8 @@ public class LogicalExample : MonoBehaviour
         XOR
     }
 
+    public float a, b, c;
+
     public NetworkConfiguration configuration;
 
     public Function function = Function.AND;
@@ -60,6 +62,8 @@ public class LogicalExample : MonoBehaviour
         convertor = new NodeToNeuronConvertor();
 
         executor = new Executor(logger, convertor, configuration);
+
+        Run();
     }
 
     private IEnumerator Thread()
@@ -73,6 +77,11 @@ public class LogicalExample : MonoBehaviour
                 executor.Invoke(data.input0, data.input1);
                 executor.Lern(learningRate, data.result);
             }
+
+            executor.Invoke(a, b);
+            executor.GetOutput(out float[] res);
+
+            c = res[0];
 
             yield return new WaitForSeconds(0.01F);
         }

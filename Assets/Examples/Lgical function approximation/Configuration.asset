@@ -14,69 +14,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   links:
   - from: 0
-    to: 2
+    to: 1
   - from: 1
     to: 2
-  - from: 2
-    to: 3
   - from: 0
-    to: 4
-  - from: 1
+    to: 3
+  - from: 3
+    to: 2
+  - from: 0
     to: 4
   - from: 4
-    to: 3
+    to: 2
   - from: 0
-    to: 5
-  - from: 1
     to: 5
   - from: 5
-    to: 3
+    to: 2
   - from: 0
-    to: 6
-  - from: 1
     to: 6
   - from: 6
-    to: 3
-  - from: 0
-    to: 7
-  - from: 1
-    to: 7
-  - from: 7
-    to: 3
+    to: 2
   nodes:
   - ID: 0
     Type: 0
     position:
       serializedVersion: 2
-      x: 298.1579
-      y: 389.18927
+      x: 439
+      y: 266.5
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 1
-    Type: 0
+    Type: 2
     position:
       serializedVersion: 2
-      x: 298.5
-      y: 486
+      x: 674
+      y: 207
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 2
-    Type: 2
+    Type: 1
     position:
       serializedVersion: 2
-      x: 492.5
-      y: 243
+      x: 864.2241
+      y: 335.2874
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 3
-    Type: 1
+    Type: 2
     position:
       serializedVersion: 2
-      x: 727.5
-      y: 431.5
+      x: 676.58563
+      y: 471.83603
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -84,8 +74,8 @@ MonoBehaviour:
     Type: 2
     position:
       serializedVersion: 2
-      x: 493.7107
-      y: 338.7107
+      x: 680.2427
+      y: 406.1309
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -93,8 +83,8 @@ MonoBehaviour:
     Type: 2
     position:
       serializedVersion: 2
-      x: 494.9214
-      y: 436.9214
+      x: 679.23987
+      y: 340.41055
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -102,26 +92,17 @@ MonoBehaviour:
     Type: 2
     position:
       serializedVersion: 2
-      x: 500.34277
-      y: 632.3428
+      x: 674.7598
+      y: 273.7102
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}
   - ID: 7
-    Type: 2
-    position:
-      serializedVersion: 2
-      x: 497.63208
-      y: 536.6321
-      width: 100
-      height: 100
-    color: {r: 1, g: 1, b: 1, a: 1}
-  - ID: 8
     Type: 0
     position:
       serializedVersion: 2
-      x: 788
-      y: 624
+      x: 478
+      y: 455
       width: 100
       height: 100
     color: {r: 1, g: 1, b: 1, a: 1}

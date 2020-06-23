@@ -1,6 +1,7 @@
 ﻿using Core.Neurons;
 using Core.Service;
 
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 
@@ -11,6 +12,13 @@ public class Executor
     private INodeConvertor<Neuron> convertor;
 
     private List<Neuron> neurons;
+    private List<Neuron> outputNeurons
+    {
+        get
+        {
+            return neurons.FindAll(x => x is OutputNeuron);
+        }
+    }
 
     public Executor(ILogger logger, INodeConvertor<Neuron> convertor, NetworkConfiguration configuration)
     {
@@ -48,8 +56,8 @@ public class Executor
             {
                 NeuronLink neuronLink = new NeuronLink(from, to, (float)random.NextDouble());
 
-                from.out_weights.Add(neuronLink);
-                to.input_weights.Add(neuronLink);
+                from.out_synapse.Add(neuronLink);
+                to.input_synapse.Add(neuronLink);
             }
             else
             {
@@ -58,22 +66,19 @@ public class Executor
         }
     }
 
-    public float Lern(float rate, params float[] values)
+    public float Lern(float rate, params float[] targetValues)
     {
         float error = 0;
 
-        var outNeurons = neurons.FindAll(x => x is OutputNeuron);
+        List<OutputNeuron> outNeurons = outputNeurons.Select(x => (OutputNeuron)x).ToList();
 
-        if (outNeurons.Count == values.Length)
+        if (outNeurons.Count == targetValues.Length)
         {
             for (int i = 0; i < outNeurons.Count; i++)
             {
-                float o = outNeurons[i].Value;
-                float t = values[i];
-
-                error += (o - t) * (o - t) * 0.5F;
-
-                outNeurons[i].Lern(rate, values[i]);
+                outNeurons[i].CalculateGradient(targetValues[i]);
+                outNeurons[i].UpdateWeights(rate);
+                outNeurons[i].Lern(rate);
             }
         }
         else
@@ -92,7 +97,8 @@ public class Executor
         {
             for (int i = 0; i < values.Length; i++)
             {
-                entryNeurons[i].Input(values[i]);
+                entryNeurons[i].Value = values[i];
+                entryNeurons[i].Input();
             }
         }
         else
@@ -105,16 +111,12 @@ public class Executor
     {
         var outputs = neurons.FindAll(x => x is OutputNeuron);
 
-        float[] result = new float[outputs.Count];
+        output = new float[outputs.Count];
 
         for (int i = 0; i < outputs.Count; i++)
         {
-            OutputNeuron output_neuron = (OutputNeuron)outputs[i];
-
-            result[i] = output_neuron.Value;
+            output[i] = outputs[i].Value;
         }
-
-        output = result;
     }
 
     public string OutToString()
@@ -125,7 +127,7 @@ public class Executor
 
         neurons.FindAll(x => x is OutputNeuron).ForEach(x =>
         {
-            text += $"{((OutputNeuron)x).Value.ToString()}\n";
+            text += $"{((OutputNeuron)x).Gradient.ToString()}\n";
         });
 
         return text;
